@@ -98,6 +98,8 @@ Statistik deskriptif dari dataset awal (699 baris) menunjukkan distribusi fitur 
 
 Distribusi kelas dihitung menggunakan `value_counts()` dan divisualisasikan dengan *pie chart*:
 
+![download](https://github.com/user-attachments/assets/f0b68d7d-2959-40fe-8cbd-5e1ab88548dc)
+
 - **Benign (0)**: 65.5% (458 sampel)
 - **Malignant (1)**: 34.5% (241 sampel)
 
@@ -113,9 +115,51 @@ Distribusi kelas dihitung menggunakan `value_counts()` dan divisualisasikan deng
   - `Single_epithelial_cell_size`: 52 outlier
   - `Marginal_adhesion`: 59 outlier
     Setelah penghapusan outlier, dataset berkurang menjadi 485 baris.
-- **Korelasi Fitur**: Heatmap korelasi menunjukkan hubungan kuat antara `Uniformity_of_cell_size` dan `Uniformity_of_cell_shape` (korelasi 0.91), serta korelasi tinggi antara fitur-fitur ini dengan `Class` (0.82), menunjukkan bahwa fitur-fitur ini sangat relevan untuk prediksi.
+- **Heatmap Korelasi Fitur**:
+Heatmap berikut menampilkan korelasi Pearson antar fitur numerik dan target `Class`. Nilai korelasi berkisar antara -1 hingga 1, di mana:
+  
+![download (1)](https://github.com/user-attachments/assets/1810fba0-a642-478f-95e5-d3013c43947c)
 
-**Tujuan**: Memahami karakteristik dataset untuk memastikan kualitas data sebelum modeling dan mengidentifikasi fitur penting untuk klasifikasi.
+- Nilai mendekati **1** menunjukkan hubungan linear positif yang kuat.
+- Nilai mendekati **0** menunjukkan tidak ada hubungan linear.
+- Nilai mendekati **-1** menunjukkan hubungan linear negatif.
+
+---
+
+📌 Korelasi Fitur terhadap Target `Class`
+
+| No | Fitur                         | Korelasi terhadap `Class` | Interpretasi                                                                 |
+|----|-------------------------------|----------------------------|------------------------------------------------------------------------------|
+| 1  | Uniformity_of_cell_size       | **0.82**                   | Sangat tinggi – sangat relevan dalam membedakan benign vs malignant.        |
+| 2  | Uniformity_of_cell_shape      | **0.82**                   | Sangat tinggi – fitur penting untuk klasifikasi kanker.                     |
+| 3  | Bare_nuclei                   | **0.82**                   | Sangat tinggi – menunjukkan banyak informasi tentang keganasan sel.         |
+| 4  | Bland_chromatin               | 0.76                       | Kuat – tekstur kromatin berperan penting.                                   |
+| 5  | Clump_thickness               | 0.72                       | Kuat – ketebalan gumpalan sel berhubungan dengan keganasan.                |
+| 6  | Normal_nucleoli               | 0.72                       | Kuat – jumlah dan bentuk nukleoli punya pengaruh dalam klasifikasi.         |
+| 7  | Marginal_adhesion             | 0.71                       | Kuat – adhesi antar sel cukup berkontribusi.                                |
+| 8  | Single_epithelial_cell_size   | 0.69                       | Sedang – cukup penting untuk model.                                         |
+| 9  | Mitoses                       | 0.42                       | Lemah – namun tetap relevan sebagai indikator biologis (laju pembelahan).   |
+
+---
+
+📌 Korelasi Antar-Fitur (Top Pairs)
+
+| Fitur A                    | Fitur B                      | Korelasi | Catatan                                                                 |
+|----------------------------|-------------------------------|----------|-------------------------------------------------------------------------|
+| Uniformity_of_cell_size    | Uniformity_of_cell_shape      | **0.91** | Sangat tinggi – indikasi multikolinearitas, waspadai saat modeling.    |
+| Uniformity_of_cell_size    | Bland_chromatin               | 0.76     | Korelasi kuat, berpotensi memberi informasi serupa.                    |
+| Uniformity_of_cell_size    | Single_epithelial_cell_size   | 0.75     | Korelasi tinggi – bisa memberikan sinyal yang redundant.               |
+| Uniformity_of_cell_shape   | Bland_chromatin               | 0.74     | Korelasi tinggi – penting untuk diperhitungkan dalam pemilihan fitur.  |
+
+---
+
+✅ Kesimpulan
+
+- Tiga fitur paling berkorelasi dengan target `Class` adalah: `Uniformity_of_cell_size`, `Uniformity_of_cell_shape`, dan `Bare_nuclei`, masing-masing dengan korelasi **0.82**.
+- Perlu diwaspadai adanya **multikolinearitas** antara `Uniformity_of_cell_size` dan `Uniformity_of_cell_shape` (**r = 0.91**) jika menggunakan model linear seperti Logistic Regression.
+- Fitur `Mitoses` memiliki korelasi paling lemah terhadap `Class`, namun tetap dapat berkontribusi secara kombinatif.
+
+**Tujuan**: Heatmap ini sangat membantu dalam memahami karakteristik dataset untuk memastikan kualitas data sebelum modeling dan mengidentifikasi fitur penting untuk klasifikasi.
 
 ---
 
@@ -127,15 +171,14 @@ Distribusi kelas dihitung menggunakan `value_counts()` dan divisualisasikan deng
    - **Konversi `Bare_nuclei`**: Mengubah nilai `"?"` menjadi `NaN` menggunakan `pd.to_numeric(errors='coerce')`, lalu menghapus baris dengan `NaN` (dataset berkurang dari 699 menjadi 683 baris).
    - **Validasi Rentang**: Memastikan nilai `Bare_nuclei` berada dalam rentang 1–10, lalu mengonversi ke `int64`.
    - **Penghapusan Duplikasi**: Menghapus 8 baris duplikat (dataset menjadi 675 baris).
-   - **Penghapusan Outlier**: Menggunakan metode IQR untuk menghapus outlier pada kolom seperti `Mitoses`, `Normal_nucleoli`, dan lainnya (dataset menjadi 485 baris).
    - **Penghapusan Kolom**: Menghapus `Sample_code_number` karena tidak relevan untuk modeling.
-2. **Encoding Target**:
-   - Mengubah `Class` dari `2` menjadi `0` (*Benign*) dan `4` menjadi `1` (*Malignant*) menggunakan `map({2: 0, 4: 1})`.
-3. **Pemisahan Data**:
+   - **Encoding Target**: Mengubah `Class` dari `2` menjadi `0` (*Benign*) dan `4` menjadi `1` (*Malignant*) menggunakan `map({2: 0, 4: 1})`.
+   - **Penghapusan Outlier**: Menggunakan metode IQR untuk menghapus outlier pada kolom seperti `Mitoses`, `Normal_nucleoli`, dan lainnya (dataset menjadi 485 baris).
+2. **Pemisahan Data**:
    - Membagi dataset menjadi data pelatihan (80%) dan pengujian (20%) dengan `train_test_split(test_size=0.2, random_state=42, stratify=y)` untuk menjaga distribusi kelas.
-4. **Normalisasi Data**:
+3. **Normalisasi Data**:
    - Menggunakan `StandardScaler` untuk menstandarisasi fitur (mean=0, std=1), penting untuk algoritma berbasis jarak seperti KNN.
-5. **Penanganan Ketidakseimbangan Kelas**:
+4. **Penanganan Ketidakseimbangan Kelas**:
    - Menerapkan SMOTE (*Synthetic Minority Over-sampling Technique*) dengan `random_state=42` untuk menyeimbangkan data pelatihan pada model KNN.
 
 ### 📌 Alasan
@@ -146,7 +189,7 @@ Distribusi kelas dihitung menggunakan `value_counts()` dan divisualisasikan deng
 - **Normalisasi**: Menyamakan skala fitur untuk meningkatkan performa algoritma seperti KNN yang sensitif terhadap jarak.
 - **SMOTE**: Mengatasi ketidakseimbangan kelas untuk meningkatkan deteksi kelas *Malignant*, yang kritis dalam konteks medis.
 
-**Hasil**: Dataset bersih dengan 485 baris dan 9 fitur numerik, siap untuk modeling, dengan data pelatihan yang seimbang untuk model KNN.
+**Hasil**: Dataset bersih dengan 485 baris dan 9 fitur numerik siap untuk dilakukan proses modeling.
 
 ---
 
