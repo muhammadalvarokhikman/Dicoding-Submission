@@ -60,26 +60,35 @@ Variabel-variabel pada dataset adalah sebagai berikut:
     *   Tidak ada nilai yang hilang (non-null count = 400 untuk semua kolom).
     *   `Food_ID` bertipe integer, sisanya object (teks).
     *   Distribusi `C_Type`: Jenis masakan 'Indian' dan 'Healthy Food' paling banyak muncul. Terdapat duplikasi minor karena spasi ('Korean' vs ' Korean') yang diperbaiki di tahap Data Preparation.
+ 
+      ![image](https://github.com/user-attachments/assets/df9fb31e-26a9-457d-8dac-f344109452c0)
+
     *   Distribusi `Veg_Non`: Sekitar 59.5% makanan adalah vegetarian, dan 40.5% non-vegetarian.
+ 
+      ![image](https://github.com/user-attachments/assets/c37bfb27-06cd-415a-a0f6-b82ed92d9f68)
+
 *   **Dataset Rating (`ratings_df`):**
     *   Awalnya 512 baris dan 3 kolom. Terdapat 1 baris dengan nilai NaN pada ketiga kolom, yang kemudian dihapus.
     *   Setelah penghapusan NaN, menjadi 511 baris.
     *   Tipe data awal adalah float64, yang kemudian diubah menjadi int64.
-    *   Distribusi Rating: Rating 3.0, 5.0, dan 10.0 adalah yang paling umum diberikan oleh pengguna.
+    *   Distribusi Rating Makanan:
+      
+      ![image](https://github.com/user-attachments/assets/8e415fbb-27d2-4cf6-af2f-275acaf5ede8)
+
+    *   Rating 3.0, 5.0, dan 10.0 adalah yang paling umum diberikan oleh pengguna.
     *   Jumlah User Unik: 100 pengguna.
     *   Jumlah Makanan Unik yang Dirating: 309 makanan (dari total 400 makanan dalam katalog).
-
-Visualisasi yang dilakukan meliputi:
-*   Distribusi Rating Makanan (Bar plot): Menunjukkan frekuensi setiap nilai rating.
-*   Distribusi Jenis Masakan (C_Type) (Bar plot): Menunjukkan popularitas setiap jenis masakan.
-*   Distribusi Makanan Vegetarian vs Non-Vegetarian (Veg_Non) (Pie chart): Menunjukkan proporsi makanan vegetarian dan non-vegetarian.
 
 ## Data Preparation
 
 Tahapan data preparation yang dilakukan adalah sebagai berikut, sesuai urutan dalam notebook:
 1.  **Pembersihan Kolom `C_Type` pada `food_df`**:
     *   **Proses**: Menggunakan `str.strip()` untuk menghapus spasi berlebih di awal dan akhir setiap nilai pada kolom `C_Type`.
-    *   **Alasan**: Untuk memastikan konsistensi data dan menghindari duplikasi kategori karena perbedaan spasi (misalnya, 'Korean' dan ' Korean' dianggap sebagai kategori yang berbeda sebelum pembersihan).
+    *   **Alasan**: Untuk memastikan konsistensi data dan menghindari duplikasi kategori karena perbedaan spasi (misalnya, 'Korean' dan ' Korean' dianggap sebagai kategori yang berbeda sebelum pembersihan). Distribusi C_Type: Jenis masakan 'Indian' dan 'Healthy Food' paling banyak muncul. dan paling sedikit muncul 'Vietnames' dan 'Spanish'.
+    
+      ![image](https://github.com/user-attachments/assets/85c21e34-1901-47a7-aa2c-9d483e1b2ebd)
+  
+      
 2.  **Penanganan Missing Values pada `ratings_df`**:
     *   **Proses**: Memeriksa nilai NaN menggunakan `isna().sum()`. Ditemukan 1 baris dengan nilai NaN di semua kolom (`User_ID`, `Food_ID`, `Rating`). Baris ini dihapus menggunakan `dropna()`.
     *   **Alasan**: Model machine learning umumnya tidak dapat memproses data dengan nilai yang hilang. Menghapus baris dengan NaN memastikan integritas data untuk pemodelan. Jumlah data rating berkurang dari 512 menjadi 511.
