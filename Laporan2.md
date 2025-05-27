@@ -39,7 +39,6 @@ Kanker payudara adalah salah satu penyebab utama kematian pada wanita di seluruh
 
 1. Mengembangkan model klasifikasi biner dengan akurasi, presisi, dan recall tinggi (>95%) untuk membedakan tumor *Benign* dan *Malignant*.
 2. Memastikan model memiliki recall tinggi untuk kelas *Malignant* guna meminimalkan *false negative* (kasus kanker yang salah diklasifikasikan sebagai jinak), yang krusial dalam konteks medis.
-3. Memilih model yang mudah diinterpretasi untuk mendukung penerimaan di lingkungan klinis.
 
 ### ⚙️ Solution Statements
 
